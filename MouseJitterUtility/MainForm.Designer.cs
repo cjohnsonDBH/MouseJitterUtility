@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.btnStartStop = new System.Windows.Forms.Button();
             this.txtMinDistance = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -90,6 +91,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtMinDistance);
             this.Controls.Add(this.btnStartStop);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "AutoMouse";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
