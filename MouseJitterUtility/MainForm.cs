@@ -13,13 +13,23 @@ namespace MouseJitterUtility
 {
     public partial class MainForm : Form
     {
+        #region Fields
+
         private bool isJittering = false;
         private Hotkey hotkey;
+
+        #endregion
+
+        #region Constructor
 
         public MainForm()
         {
             InitializeComponent();
+
+            // Initialize the hotkey with Shift + J and the ToggleJitter method as the callback
             hotkey = new Hotkey(Keys.J, KeyModifier.Shift, ToggleJitter);
+
+            // Register the hotkey with the current form
             hotkey.Register(this);
 
             // Retrieve and set the initial values for the text boxes
@@ -27,10 +37,29 @@ namespace MouseJitterUtility
             txtMaxDistance.Text = Properties.Settings.Default.maxDistance.ToString();
         }
 
+        #endregion
+
+        #region Event Handlers
+
         private void btnStartStop_Click(object sender, EventArgs e)
         {
             ToggleJitter();
         }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Save the current values of the text boxes to application settings
+            Properties.Settings.Default.minDistance = int.Parse(txtMinDistance.Text);
+            Properties.Settings.Default.maxDistance = int.Parse(txtMaxDistance.Text);
+            Properties.Settings.Default.Save();
+
+            // Unregister the hotkey
+            hotkey.Unregister();
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private void ToggleJitter()
         {
@@ -124,76 +153,85 @@ namespace MouseJitterUtility
             }
         }
 
+        #endregion
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        #region Hotkey Class
+
+        public class Hotkey : IDisposable
         {
-            // Save the current values of the text boxes to application settings
-            Properties.Settings.Default.minDistance = int.Parse(txtMinDistance.Text);
-            Properties.Settings.Default.maxDistance = int.Parse(txtMaxDistance.Text);
-            Properties.Settings.Default.Save();
+            #region Fields
 
-            hotkey.Unregister();
-        }
+            public int id;
+            private readonly IntPtr handle;
+            public readonly KeyModifier modifier;
+            public readonly Keys key;
+            public readonly Action callback;
 
-        protected override void WndProc(ref Message m)
-        {
-            base.WndProc(ref m);
+            #endregion
 
-            if (m.Msg == 0x0312 && m.WParam.ToInt32() == hotkey.id)
+            #region Constructor
+
+            public Hotkey(Keys key, KeyModifier modifier, Action callback)
             {
-                hotkey.callback.Invoke();
+                this.key = key;
+                this.modifier = modifier;
+                this.callback = callback;
+                handle = IntPtr.Zero;
             }
+
+            #endregion
+
+            #region Public Methods
+
+            public void Register(Form form)
+            {
+                // Generate a unique ID for the hotkey based on the form's hash code
+                id = form.GetHashCode();
+
+                // Register the hotkey with the form's handle
+                if (!RegisterHotKey(form.Handle, id, (int)modifier, (int)key))
+                    throw new InvalidOperationException("Couldn't register the hotkey.");
+            }
+
+            public void Unregister()
+            {
+                // Unregister the hotkey
+                UnregisterHotKey(handle, id);
+            }
+
+            public void Dispose()
+            {
+                // Unregister the hotkey when disposing the object
+                Unregister();
+            }
+
+            #endregion
+
+            #region Native Methods
+
+            [DllImport("user32.dll")]
+            private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
+
+            [DllImport("user32.dll")]
+            private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+            #endregion
         }
-    }
 
-    public class Hotkey : IDisposable
-    {
-        public int id;
-        private readonly IntPtr handle;
-        public readonly KeyModifier modifier;
-        public readonly Keys key;
-        public readonly Action callback;
+        #endregion
 
+        #region Enum
 
-        public Hotkey(Keys key, KeyModifier modifier, Action callback)
+        [Flags]
+        public enum KeyModifier
         {
-            this.key = key;
-            this.modifier = modifier;
-            this.callback = callback;
-            handle = IntPtr.Zero;
+            None = 0,
+            Alt = 1,
+            Ctrl = 2,
+            Shift = 4,
+            Win = 8
         }
 
-        public void Register(Form form)
-        {
-            id = form.GetHashCode();
-            if (!RegisterHotKey(form.Handle, id, (int)modifier, (int)key))
-                throw new InvalidOperationException("Couldn't register the hotkey.");
-        }
-
-        public void Unregister()
-        {
-            UnregisterHotKey(handle, id);
-        }
-
-        public void Dispose()
-        {
-            Unregister();
-        }
-
-        [DllImport("user32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
-
-        [DllImport("user32.dll")]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-    }
-
-    [Flags]
-    public enum KeyModifier
-    {
-        None = 0,
-        Alt = 1,
-        Ctrl = 2,
-        Shift = 4,
-        Win = 8
+        #endregion
     }
 }
