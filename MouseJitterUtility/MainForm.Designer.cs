@@ -58,20 +58,20 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(40, 27);
+            this.label1.Location = new System.Drawing.Point(18, 27);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(79, 15);
+            this.label1.Size = new System.Drawing.Size(103, 15);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Min Distance:";
+            this.label1.Text = "Min Distance (px):";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(40, 56);
+            this.label2.Location = new System.Drawing.Point(16, 56);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(81, 15);
+            this.label2.Size = new System.Drawing.Size(105, 15);
             this.label2.TabIndex = 4;
-            this.label2.Text = "Max Distance:";
+            this.label2.Text = "Max Distance (px):";
             // 
             // txtMaxDistance
             // 
@@ -85,13 +85,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(216, 181);
+            this.ClientSize = new System.Drawing.Size(211, 181);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtMaxDistance);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtMinDistance);
             this.Controls.Add(this.btnStartStop);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "MainForm";
             this.Text = "AutoMouse";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
