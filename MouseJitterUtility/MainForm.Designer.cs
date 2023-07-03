@@ -34,6 +34,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.txtMaxDistance = new System.Windows.Forms.TextBox();
+            this.chkSmoothTransitions = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnStartStop
@@ -81,11 +82,23 @@
             this.txtMaxDistance.TabIndex = 3;
             this.txtMaxDistance.Text = "15";
             // 
+            // chkSmoothTransitions
+            // 
+            this.chkSmoothTransitions.AutoSize = true;
+            this.chkSmoothTransitions.Location = new System.Drawing.Point(34, 95);
+            this.chkSmoothTransitions.Name = "chkSmoothTransitions";
+            this.chkSmoothTransitions.Size = new System.Drawing.Size(129, 19);
+            this.chkSmoothTransitions.TabIndex = 5;
+            this.chkSmoothTransitions.Text = "Smooth Movement";
+            this.chkSmoothTransitions.UseVisualStyleBackColor = true;
+            this.chkSmoothTransitions.CheckedChanged += new System.EventHandler(this.chkSmoothTransitions_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(211, 181);
+            this.Controls.Add(this.chkSmoothTransitions);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtMaxDistance);
             this.Controls.Add(this.label1);
@@ -109,5 +122,6 @@
         private Label label1;
         private Label label2;
         private TextBox txtMaxDistance;
+        private CheckBox chkSmoothTransitions;
     }
 }

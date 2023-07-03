@@ -17,6 +17,7 @@ namespace MouseJitterUtility
 
         private bool isJittering = false;
         private Hotkey hotkey;
+        private bool enableSmoothTransitions = false;
 
         #endregion
 
@@ -40,6 +41,10 @@ namespace MouseJitterUtility
         #endregion
 
         #region Event Handlers
+        private void chkSmoothTransitions_CheckedChanged(object sender, EventArgs e)
+        {
+            enableSmoothTransitions = chkSmoothTransitions.Checked;
+        }
 
         private void btnStartStop_Click(object sender, EventArgs e)
         {
@@ -118,15 +123,17 @@ namespace MouseJitterUtility
             targetX = Math.Max(0, Math.Min(Screen.PrimaryScreen.Bounds.Width - 1, targetX));
             targetY = Math.Max(0, Math.Min(Screen.PrimaryScreen.Bounds.Height - 1, targetY));
 
-            // Calculate the step distance for smooth movement
-            double stepX = (targetX - currentPosition.X) / 15.0;
-            double stepY = (targetY - currentPosition.Y) / 15.0;
+            // Calculate the number of steps for smooth movement
+            int steps = enableSmoothTransitions ? 15 : 1;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i <= steps; i++)
             {
-                // Calculate the intermediate position
-                int intermediateX = (int)(currentPosition.X + stepX * i);
-                int intermediateY = (int)(currentPosition.Y + stepY * i);
+                // Calculate the interpolation factor based on the current step
+                double t = enableSmoothTransitions ? Interpolation.EaseInOutCubic((double)i / steps) : 1.0;
+
+                // Calculate the intermediate position using interpolation
+                int intermediateX = (int)(currentPosition.X + (targetX - currentPosition.X) * t);
+                int intermediateY = (int)(currentPosition.Y + (targetY - currentPosition.Y) * t);
 
                 // Move the mouse to the intermediate position
                 Cursor.Position = new Point(intermediateX, intermediateY);
@@ -134,9 +141,6 @@ namespace MouseJitterUtility
                 // Sleep for a short interval to create smooth movement
                 System.Threading.Thread.Sleep(movementInterval);
             }
-
-            // Move the mouse to the final target position
-            Cursor.Position = new Point(targetX, targetY);
 
             if (isJittering)
             {
@@ -245,4 +249,16 @@ namespace MouseJitterUtility
 
         #endregion
     }
+    #region Interpolation Class
+
+    public static class Interpolation
+    {
+        // Easing functions for smooth transitions
+        public static double EaseInOutCubic(double t)
+        {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.Pow(-2 * t + 2, 3) / 2;
+        }
+    }
+
+    #endregion
 }
