@@ -155,9 +155,20 @@ namespace MouseJitterUtility
 
         #endregion
 
-        #region Hotkey Class
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
 
-        public class Hotkey : IDisposable
+            if (m.Msg == 0x0312 && m.WParam.ToInt32() == hotkey.id)
+            {
+                hotkey.callback.Invoke();
+            }
+        }
+    
+
+    #region Hotkey Class
+
+    public class Hotkey : IDisposable
         {
             #region Fields
 
