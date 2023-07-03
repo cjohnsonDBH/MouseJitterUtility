@@ -36,11 +36,41 @@ namespace MouseJitterUtility
             // Retrieve and set the initial values for the text boxes
             txtMinDistance.Text = Properties.Settings.Default.minDistance.ToString();
             txtMaxDistance.Text = Properties.Settings.Default.maxDistance.ToString();
+            txtFrequency.Text = Properties.Settings.Default.frequency.ToString();
+            txtPauseDuration.Text = Properties.Settings.Default.pauseDuration.ToString();
+            trackIntensity.Value = Properties.Settings.Default.intensity;
         }
 
         #endregion
 
         #region Event Handlers
+        private void trackIntensity_ValueChanged(object sender, EventArgs e)
+        {
+            // Update the speed value based on the TrackBar's Value property
+            int speed = trackIntensity.Value;
+
+            // Calculate the movement interval based on the speed (lower values indicate faster movements)
+            int movementInterval = 100 - speed;
+
+            // Update the text box to display the speed value
+            txtSpeed.Text = speed.ToString();
+
+            // Update the movement interval for existing jittering (if currently jittering)
+            if (isJittering)
+            {
+                System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
+                timer.Interval = movementInterval;
+                timer.Tick += (sender, e) =>
+                {
+                    MoveMouse(movementInterval);
+                    timer.Stop();
+                    timer.Dispose();
+                };
+                timer.Start();
+            }
+        }
+
+
         private void chkSmoothTransitions_CheckedChanged(object sender, EventArgs e)
         {
             enableSmoothTransitions = chkSmoothTransitions.Checked;
@@ -56,6 +86,9 @@ namespace MouseJitterUtility
             // Save the current values of the text boxes to application settings
             Properties.Settings.Default.minDistance = int.Parse(txtMinDistance.Text);
             Properties.Settings.Default.maxDistance = int.Parse(txtMaxDistance.Text);
+            Properties.Settings.Default.frequency = txtFrequency.Text;
+            Properties.Settings.Default.pauseDuration = txtPauseDuration.Text;
+            Properties.Settings.Default.intensity = trackIntensity.Value;
             Properties.Settings.Default.Save();
 
             // Unregister the hotkey
@@ -83,9 +116,24 @@ namespace MouseJitterUtility
             isJittering = true;
             btnStartStop.Text = "Stop";
 
-            // Start moving the mouse
-            MoveMouse();
+            // Retrieve the stored minimum and maximum jitter distances from application settings
+            int minJitterDistance = int.Parse(txtMinDistance.Text);
+            int maxJitterDistance = int.Parse(txtMaxDistance.Text);
+
+            // Update the text boxes with the new values
+            txtMinDistance.Text = minJitterDistance.ToString();
+            txtMaxDistance.Text = maxJitterDistance.ToString();
+
+            // Retrieve the speed value from the trackbar
+            int speed = trackIntensity.Value;
+
+            // Calculate the movement interval based on the speed (lower values indicate faster movements)
+            int movementInterval = 100 - speed;
+
+            // Start moving the mouse with the specified movement interval
+            MoveMouse(movementInterval);
         }
+
 
         private void StopJitter()
         {
@@ -93,7 +141,7 @@ namespace MouseJitterUtility
             btnStartStop.Text = "Start";
         }
 
-        private void MoveMouse()
+        private void MoveMouse(int movementInterval)
         {
             Random random = new Random();
 
@@ -107,7 +155,7 @@ namespace MouseJitterUtility
 
 
             // Set the interval between mouse movements in milliseconds
-            int movementInterval = 20;
+            int interval = movementInterval;
 
             // Get the current mouse position
             Point currentPosition = Cursor.Position;
@@ -139,17 +187,17 @@ namespace MouseJitterUtility
                 Cursor.Position = new Point(intermediateX, intermediateY);
 
                 // Sleep for a short interval to create smooth movement
-                System.Threading.Thread.Sleep(movementInterval);
+                System.Threading.Thread.Sleep(interval);
             }
 
             if (isJittering)
             {
-                // Schedule the next mouse movement
+                // Schedule the next mouse movement after the pause duration
                 System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
-                timer.Interval = movementInterval * 10;  // Increase the interval for smoother movement
+                timer.Interval = interval;
                 timer.Tick += (sender, e) =>
                 {
-                    MoveMouse();
+                    MoveMouse(movementInterval);
                     timer.Stop();
                     timer.Dispose();
                 };

@@ -70,5 +70,41 @@ namespace MouseJitterUtility.Properties {
                 this["HotkeyModifier"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public string frequency {
+            get {
+                return ((string)(this["frequency"]));
+            }
+            set {
+                this["frequency"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int intensity {
+            get {
+                return ((int)(this["intensity"]));
+            }
+            set {
+                this["intensity"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public string pauseDuration {
+            get {
+                return ((string)(this["pauseDuration"]));
+            }
+            set {
+                this["pauseDuration"] = value;
+            }
+        }
     }
 }
